@@ -11,6 +11,7 @@ now = datetime.datetime.now()
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 general_topic = SwitchConfigs.mosquitto_switch_user
+logging.basicConfig(filename=BASE_DIR + '/logs/test_switch.log', level=logging.DEBUG)
 
 
 def threaded_function(message_payload):

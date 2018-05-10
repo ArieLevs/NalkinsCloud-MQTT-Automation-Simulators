@@ -8,8 +8,10 @@ from mqtt_handler import *
 from random import randint
 
 now = datetime.datetime.now()
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 general_topic = TemperatureConfigs.mosquitto_dht_user
+logging.basicConfig(filename=BASE_DIR + '/logs/test_dht.log', level=logging.DEBUG)
 
 
 def on_message(client, userdata, msg):

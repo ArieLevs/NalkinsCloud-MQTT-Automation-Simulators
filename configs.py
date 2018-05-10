@@ -7,9 +7,9 @@ mosquitto_host = 'nalkins.cloud'
 
 class TemperatureConfigs(object):
     device_type = "dht"
-    mosquitto_host = '127.0.0.1'
-    mosquitto_port = 1883
-    mosquitto_dht_user = 'test_dht_simulate'  # Device
+    mosquitto_host = ''
+    mosquitto_port = 8883
+    mosquitto_dht_user = 'test_dht_simulator'  # Device
     mosquitto_dht_pass = ''  # Device password
     qos = 1
     mosquitto_cert_location = "/etc/mosquitto/certs/mosquitto_server.crt"
@@ -17,9 +17,9 @@ class TemperatureConfigs(object):
 
 class SwitchConfigs(object):
     device_type = "switch"
-    mosquitto_host = '127.0.0.1'
-    mosquitto_port = 1883
-    mosquitto_switch_user = 'test_switch_simulate'  # Device
+    mosquitto_host = ''
+    mosquitto_port = 8883
+    mosquitto_switch_user = 'test_switch_simulator'  # Device
     mosquitto_switch_pass = ''  # Device password
     qos = 1
     mosquitto_cert_location = "/etc/mosquitto/certs/mosquitto_server.crt"
