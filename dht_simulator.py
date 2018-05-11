@@ -11,7 +11,7 @@ now = datetime.datetime.now()
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 general_topic = TemperatureConfigs.mosquitto_dht_user
-logging.basicConfig(filename=BASE_DIR + '/logs/test_dht.log', level=logging.DEBUG)
+logging.basicConfig(filename='/var/log/nalkinscloud_mqtt_simulators/dht_simulator.log', level=logging.DEBUG)
 
 
 def on_message(client, userdata, msg):
