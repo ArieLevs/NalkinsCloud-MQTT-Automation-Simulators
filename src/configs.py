@@ -2,12 +2,12 @@
 import os
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
-PROJECT_NAME = os.environ.get('project_name', 'nalkinscloud-mqtt-simulators')
+PROJECT_NAME = 'nalkinscloud-mqtt-simulators'
 ENVIRONMENT = os.environ.get('environment', 'dev')
 
 BROKER_HOST = os.environ.get('broker_host', 'localhost')
 BROKER_PORT = int(os.environ.get('broker_port', 1883))
-BROKER_CERT = os.environ.get('cert_location', BASE_DIR + "/certificates/alpha.mosquitto_server.crt")
+BROKER_CERT = BASE_DIR + "/certificates/mosquitto_server.crt"
 
 DEVICES = {
     'dht': {
@@ -15,7 +15,7 @@ DEVICES = {
         'device_pass': os.environ.get('dht_pass', 'nalkinscloud'),
         'device_type': 'dht',
         'topic': os.environ.get('dht_topic', 'test_dht_simulator'),
-        'qos': int(os.environ.get('qos', 1)),
+        'qos': int(os.environ.get('dht_qos', 1)),
         'subscription_update': 'update_now'
     },
     'switch': {
@@ -23,7 +23,7 @@ DEVICES = {
         'device_pass': os.environ.get('switch_pass', 'nalkinscloud'),
         'device_type': 'switch',
         'topic': os.environ.get('switch_topic', 'test_switch_simulator'),
-        'qos': int(os.environ.get('qos', 1)),
+        'qos': int(os.environ.get('switch_qos', 1)),
         'subscription_update': 'change_switch'
     }
 }
