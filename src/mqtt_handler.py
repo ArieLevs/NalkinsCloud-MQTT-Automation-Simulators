@@ -1,24 +1,41 @@
+
 import paho.mqtt.client as mqtt
+from functions import is_valid_topic
+from random import randint
 import ssl
+from logging_handler import logger
+from configs import BROKER_HOST, BROKER_PORT, BROKER_CERT, CONNECTION_RETURN_STATUS
 
 
 class MQTTClient(object):
 
-    _mqtt_client = None
-    _device_id = None
-    _device_type = None
+    _broker_host = BROKER_HOST
+    _broker_port = BROKER_PORT
+    _broker_cert = BROKER_CERT
 
-    def __init__(self, device_id, device_type, device_password,
-                 cert_location):
+    def __init__(self, device_id, device_type, device_password, qos, topic, subscription_update):
+
+        self._device_id = device_id
+        self._device_type = device_type
+        self._qos = qos
+        self._topic = topic
+        self._subscription_update = subscription_update
+
         # Client(client_id="", clean_session=True, userdata=None, protocol=MQTTv31)
         self._mqtt_client = mqtt.Client(client_id=device_id,
                                         clean_session=False,
-                                        userdata=None)
-        self._device_id = device_id
-        self._device_type = device_type
+                                        userdata={'device_id': device_id,
+                                                  'device_type': device_type,
+                                                  'qos': qos})
 
         self._mqtt_client.username_pw_set(username=device_id, password=device_password)
-        self._mqtt_client.tls_set(ca_certs=cert_location, tls_version=ssl.PROTOCOL_TLSv1_1)
+        self._mqtt_client.tls_set(ca_certs=self._broker_cert, tls_version=ssl.PROTOCOL_TLSv1_1)
+
+        if device_type is 'dht':
+            self._mqtt_client.on_message = self.on_dht_message
+        elif device_type is 'switch':
+            self._mqtt_client.on_message = self.on_switch_message
+        self._mqtt_client.on_connect = self.on_connect
 
     def get_mqtt_client(self):
         return self._mqtt_client
@@ -31,9 +48,15 @@ class MQTTClient(object):
                                    qos=qos,
                                    retain=is_retained)
 
-    # connect the client to a broker, this is a blocking function.
-    def connect(self, host_name, port):
-        self._mqtt_client.connect(host_name, port=port, keepalive=60)
+    # connect the client to the broker, this is a blocking function.
+    def connect(self):
+        try:
+            self._mqtt_client.connect(host=self._broker_host, port=self._broker_port, keepalive=60)
+        except Exception as exc:
+            logger.error('Connection Error: {}'.format(str(exc)) +
+                         '. Host: ' + self._broker_host +
+                         '. Port: ' + str(self._broker_port))
+            exit(1)
 
     def subscribe(self, topic, qos):
         self._mqtt_client.subscribe(topic, qos=qos)
@@ -45,13 +68,80 @@ class MQTTClient(object):
         # publish(topic, payload=None, qos=0, retain=False)
         self._mqtt_client.publish(topic, payload=payload, qos=qos, retain=True)
 
-    def on_message(self, client, userdata, msg):
-        print("New message from " + str(self) + " " + str(userdata))
-        print(msg.topic + " " + msg.payload.decode('UTF-8'))
+    def on_switch_message(self, client, userdata, msg):
+        message_topic = msg.topic  # Get message topic
+        message_payload = msg.payload.decode('UTF-8')  # Get message body
+        qos = str(msg.qos)
 
-    def on_connect(self, client, userdata, rc):
-        print("Client: " + str(self) + ", User data: " + str(userdata))
-        print("Connected with result code " + str(rc))
+        if is_valid_topic(message_topic):
+            parsed_topic = message_topic.split('/')
+            logger.info("Incoming message for device_id: " + parsed_topic[0] +
+                        "\n\tdevice_type: " + parsed_topic[1] +
+                        "\n\tsubject: " + parsed_topic[2] +
+                        "\n\tmessage_body: " + message_payload +
+                        "\n\tqos: " + qos)
+
+            self.publish_retained(
+                topic=self._topic + "/" + self._device_type + "/from_device_current_status",
+                payload=message_payload,
+                qos=msg.qos)
+        else:
+            logger.error("Error: invalid topic received")
+
+    def on_dht_message(self, client, userdata, msg):
+        message_topic = msg.topic  # Get message topic
+        message_payload = msg.payload.decode('UTF-8')  # Get message body
+        qos = str(msg.qos)
+
+        if is_valid_topic(message_topic):
+            parsed_topic = message_topic.split('/')
+            logger.info("Incoming message for device_id: " + parsed_topic[0] +
+                        "\n\tdevice_type: " + parsed_topic[1] +
+                        "\n\tsubject: " + parsed_topic[2] +
+                        "\n\tmessage_body: " + message_payload +
+                        "\n\tqos: " + qos)
+
+            temp = randint(10, 25)
+            humidity = randint(20, 80)
+
+            self.publish_retained(topic=self._topic + '/' + self._device_type + '/temperature',
+                                  payload=temp,
+                                  qos=self._qos)
+            self.publish_retained(topic=self._topic + '/' + self._device_type + '/humidity',
+                                  payload=humidity,
+                                  qos=self._qos)
+        else:
+            logger.error("Error: invalid topic received")
+
+    def on_dht_connect(self, mqttc, userdata, flags, rc):
+        if rc is not 0:
+
+            logger.error("Error: " + self._device_id +
+                         ", " + CONNECTION_RETURN_STATUS.get(rc))
+            exit(1)
+
+        else:
+            self.publish_retained(topic=self._topic + '/' + self._device_type + '/status',
+                                  payload="online",
+                                  qos=self._qos)
+            self.subscribe(topic=self._topic + '/' + self._device_type + '/update_now',
+                           qos=self._qos)
+            logger.info(CONNECTION_RETURN_STATUS.get(rc))
+
+    def on_connect(self, mqttc, userdata, flags, rc):
+        if rc is not 0:
+
+            logger.error("Error: " + self._device_id +
+                         ", " + CONNECTION_RETURN_STATUS.get(rc))
+            exit(1)
+
+        else:
+            self.publish_retained(topic=self._topic + '/' + self._device_type + '/status',
+                                  payload="online",
+                                  qos=self._qos)
+            self.subscribe(topic=self._topic + '/' + self._device_type + '/' + self._subscription_update,
+                           qos=self._qos)
+            logger.info(CONNECTION_RETURN_STATUS.get(rc))
 
     # Disconnect from the broker cleanly.
     # Using disconnect() will not result in a will (LWT) message being sent by the broker

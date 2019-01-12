@@ -10,7 +10,7 @@ if ENVIRONMENT != 'production':
 else:
     logger.setLevel(logging.INFO)
 
-if ENVIRONMENT != 'dev':
+if GRAYLOG_ENABLED:
     handler = graypy.GELFHandler(host=GRAYLOG_HOST,
                                  port=GRAYLOG_PORT)
 else:
