@@ -4,7 +4,7 @@ from functions import is_valid_topic
 from random import randint
 import ssl
 from logging_handler import logger
-from configs import BROKER_HOST, BROKER_PORT, BROKER_CERT, CONNECTION_RETURN_STATUS
+from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT, CONNECTION_RETURN_STATUS
 
 
 class MQTTClient(object):
@@ -12,6 +12,7 @@ class MQTTClient(object):
     _broker_host = BROKER_HOST
     _broker_port = BROKER_PORT
     _broker_cert = BROKER_CERT
+    _broker_tls = BROKER_TLS
 
     def __init__(self, device_id, device_type, device_password, qos, topic, subscription_update):
 
@@ -29,7 +30,9 @@ class MQTTClient(object):
                                                   'qos': qos})
 
         self._mqtt_client.username_pw_set(username=device_id, password=device_password)
-        self._mqtt_client.tls_set(ca_certs=self._broker_cert, tls_version=ssl.PROTOCOL_TLSv1_1)
+
+        if self._broker_tls:
+            self._mqtt_client.tls_set(ca_certs=self._broker_cert, tls_version=ssl.PROTOCOL_TLSv1_1)
 
         if device_type is 'dht':
             self._mqtt_client.on_message = self.on_dht_message
