@@ -8,14 +8,14 @@ import socket
 import random
 import os
 
-host_name = "mosquitto.nalkins.cloud"
-server_port = 8883
+host_name = "alpha.mosquitto.nalkins.cloud"
+server_port = 1883
 device_id = "test_switch_simulator"
-device_password = "nalkinscloud"
+device_password = "test_switch_simulator"
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 cert_location = BASE_DIR + "/certificates/alpha.mosquitto_server.crt"
-topic = "test_switch_simulator/switch/from_device_current_status"
+topic = "test_switch_simulator/switch/status"
 
 auth = {
   'username': device_id,
@@ -34,18 +34,18 @@ def publishmsg(top, msg):
                    hostname=host_name,
                    auth=auth,
                    client_id=device_id,
-                   tls=tls,
                    port=server_port,
                    protocol=mqtt.MQTTv311,
                    retain=True)
 
 
 temp = random.randint(10, 33)
-text = 0
+text = 'offline'
 data = {
     'host': socket.gethostname(),
     'short_message': text,
 }
 
 print("Publishing message")
-publishmsg(topic, json.dumps(text))
+#publishmsg(topic, json.dumps(text))
+publishmsg(topic, text)

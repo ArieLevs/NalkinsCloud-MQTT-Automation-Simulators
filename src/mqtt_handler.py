@@ -5,6 +5,7 @@ from random import randint
 import ssl
 from logging_handler import logger
 from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT, CONNECTION_RETURN_STATUS
+from datetime import datetime
 
 
 class MQTTClient(object):
@@ -62,13 +63,16 @@ class MQTTClient(object):
             exit(1)
 
     def subscribe(self, topic, qos):
+        logger.info(str(datetime.now()) + " Subscribing to: " + topic)
         self._mqtt_client.subscribe(topic, qos=qos)
 
     def publish(self, topic, payload, qos):
+        logger.info(str(datetime.now()) + " Publish: " + topic)
         self._mqtt_client.publish(topic, payload=payload, qos=qos, retain=False)
 
     def publish_retained(self, topic, payload, qos):
         # publish(topic, payload=None, qos=0, retain=False)
+        logger.info(str(datetime.now()) + " Publish RETAINED: " + topic)
         self._mqtt_client.publish(topic, payload=payload, qos=qos, retain=True)
 
     def on_switch_message(self, client, userdata, msg):
@@ -78,7 +82,7 @@ class MQTTClient(object):
 
         if is_valid_topic(message_topic):
             parsed_topic = message_topic.split('/')
-            logger.info("Incoming message for device_id: " + parsed_topic[0] +
+            logger.info(str(datetime.now()) + " Incoming message for device_id: " + parsed_topic[0] +
                         "\n\tdevice_type: " + parsed_topic[1] +
                         "\n\tsubject: " + parsed_topic[2] +
                         "\n\tmessage_body: " + message_payload +
@@ -98,7 +102,7 @@ class MQTTClient(object):
 
         if is_valid_topic(message_topic):
             parsed_topic = message_topic.split('/')
-            logger.info("Incoming message for device_id: " + parsed_topic[0] +
+            logger.info(str(datetime.now()) + " Incoming message for device_id: " + parsed_topic[0] +
                         "\n\tdevice_type: " + parsed_topic[1] +
                         "\n\tsubject: " + parsed_topic[2] +
                         "\n\tmessage_body: " + message_payload +
@@ -144,7 +148,7 @@ class MQTTClient(object):
                                   qos=self._qos)
             self.subscribe(topic=self._topic + '/' + self._device_type + '/' + self._subscription_update,
                            qos=self._qos)
-            logger.info(CONNECTION_RETURN_STATUS.get(rc))
+            logger.info(str(datetime.now()) + " " + CONNECTION_RETURN_STATUS.get(rc))
 
     # Disconnect from the broker cleanly.
     # Using disconnect() will not result in a will (LWT) message being sent by the broker
