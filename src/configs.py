@@ -41,7 +41,7 @@ CONNECTION_RETURN_STATUS = {
 ######################
 # LOGGING SETTINGS
 ######################
-GRAYLOG_ENABLED = os.environ.get('graylog_enabled', False)
+GRAYLOG_ENABLED = os.environ.get('graylog_enabled', False) == 'True'
 GRAYLOG_HOST = os.environ.get('graylog_host', 'localhost')
 GRAYLOG_PORT = os.environ.get('graylog_port', 12201)
 EXTRA_FIELDS = {'application': PROJECT_NAME, 'environment': ENVIRONMENT}
