@@ -11,8 +11,7 @@ else:
     logger.setLevel(logging.INFO)
 
 if GRAYLOG_ENABLED:
-    handler = graypy.GELFHandler(host=GRAYLOG_HOST,
-                                 port=GRAYLOG_PORT)
+    handler = graypy.GELFUDPHandler(host=GRAYLOG_HOST, port=GRAYLOG_PORT)
 else:
     handler = logging.StreamHandler()
 
