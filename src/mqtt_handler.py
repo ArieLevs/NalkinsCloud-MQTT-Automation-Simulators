@@ -4,19 +4,40 @@ from functions import is_valid_topic
 from random import randint
 import ssl
 from logging_handler import logger
-from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT, CONNECTION_RETURN_STATUS
 from datetime import datetime
 
 
+CONNECTION_RETURN_STATUS = {
+    0: 'Connection successful',
+    1: 'Connection refused - incorrect protocol version',
+    2: 'Connection refused - invalid client identifier',
+    3: 'Connection refused - server unavailable',
+    4: 'Connection refused - bad username or password',
+    5: 'Connection refused - not authorised'
+}
+
+
 class MQTTClient(object):
+    _broker_host = None
+    _broker_port = None
+    _broker_tls = None
+    _broker_cert = None
 
-    _broker_host = BROKER_HOST
-    _broker_port = BROKER_PORT
-    _broker_cert = BROKER_CERT
-    _broker_tls = BROKER_TLS
+    _device_id = None
+    _device_type = None
+    _qos = None
+    _topic = None
+    _subscription_update = None
+    _mqtt_client = None
 
-    def __init__(self, device_id, device_type, device_password, qos, topic, subscription_update):
+    def __init__(self, broker_host='127.0.0.1', broker_port=1883,
+                 broker_tls=False, broker_cert=''):
+        self._broker_host = broker_host
+        self._broker_port = broker_port
+        self._broker_cert = broker_cert
+        self._broker_tls = broker_tls
 
+    def init_device(self, device_id, device_type, device_password, qos, topic, subscription_update):
         self._device_id = device_id
         self._device_type = device_type
         self._qos = qos
