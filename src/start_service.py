@@ -3,7 +3,6 @@ from threading import Thread
 from mqtt_handler import MQTTClient
 from configs import DEVICES
 from logging_handler import logger
-from functions import get_self_version
 from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT
 
 
@@ -36,7 +35,6 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
 
 
 if __name__ == '__main__':
-    logger.info("mqtt simulator version: '{}'".format(get_self_version('nalkinscloud-mqtt-simulators')))
     for key, value in DEVICES.items():
 
         Thread(target=init_simulator,
