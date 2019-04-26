@@ -1,5 +1,5 @@
 import unittest
-from src.functions import is_valid_topic
+from functions import is_valid_topic
 from mqtt_handler import MQTTClient
 from configs import *
 
