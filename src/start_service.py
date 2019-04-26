@@ -26,7 +26,8 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
                             device_type=device_type,
                             qos=device_qos,
                             is_retained=True)
-        mqtt_client.connect()
+        if not mqtt_client.connect():
+            exit(1)
         mqtt_client.do_loop_forever()
 
         # If reached this point, then mqtt_client existed on some point, terminate

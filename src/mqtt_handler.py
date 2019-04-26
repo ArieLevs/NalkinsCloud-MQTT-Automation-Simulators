@@ -45,20 +45,20 @@ class MQTTClient(object):
         self._subscription_update = subscription_update
 
         # Client(client_id="", clean_session=True, userdata=None, protocol=MQTTv31)
-        self._mqtt_client = mqtt.Client(client_id=device_id,
+        self._mqtt_client = mqtt.Client(client_id=self._device_id,
                                         clean_session=False,
-                                        userdata={'device_id': device_id,
+                                        userdata={'device_id': self._device_id,
                                                   'device_type': device_type,
                                                   'qos': qos})
 
-        self._mqtt_client.username_pw_set(username=device_id, password=device_password)
+        self._mqtt_client.username_pw_set(username=self._device_id, password=device_password)
 
         if self._broker_tls:
             self._mqtt_client.tls_set(ca_certs=self._broker_cert, tls_version=ssl.PROTOCOL_TLSv1_1)
 
-        if device_type is 'dht':
+        if self._device_type is 'dht':
             self._mqtt_client.on_message = self.on_dht_message
-        elif device_type is 'switch':
+        elif self._device_type is 'switch':
             self._mqtt_client.on_message = self.on_switch_message
         self._mqtt_client.on_connect = self.on_connect
 
@@ -77,15 +77,16 @@ class MQTTClient(object):
     def connect(self):
         try:
             self._mqtt_client.connect(host=self._broker_host, port=self._broker_port, keepalive=60)
+            return True
         except Exception as exc:
             logger.error('Connection Error: {}'.format(str(exc)) +
                          '. Host: ' + self._broker_host +
                          '. Port: ' + str(self._broker_port))
-            exit(1)
+            return False
 
     def subscribe(self, topic, qos):
         logger.info(str(datetime.now()) + " Subscribing to: " + topic)
-        self._mqtt_client.subscribe(topic, qos=qos)
+        return self._mqtt_client.subscribe(topic, qos=qos)
 
     def publish(self, topic, payload, qos):
         logger.info(str(datetime.now()) + " Publish: " + topic)
