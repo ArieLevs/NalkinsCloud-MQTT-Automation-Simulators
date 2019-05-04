@@ -22,3 +22,18 @@ Docker container expects these env vars:
 - graylog_port
 
 For deploying on Kubernetes view this [Helm chart](https://github.com/ArieLevs/Kubernetes-Helm-Charts/tree/master/charts/nalkinscloud-mqtt-simulators)
+
+Build image
+-----------
+Create docker image   
+```bash
+docker build \
+    --build-arg PYPI_REPO=https://nexus.nalkins.cloud/repository/pypi-repo/simple \
+    -t docker.nalkins.cloud/nalkinscloud-mqtt-automation-simulators/nalkinscloud-mqtt-automation-simulators:latest .
+```  
+
+Upload 
+```bash
+docker push \
+    docker.nalkins.cloud/nalkinscloud-mqtt-automation-simulators/nalkinscloud-mqtt-automation-simulators:latest
+```
