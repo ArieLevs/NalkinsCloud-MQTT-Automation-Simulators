@@ -15,4 +15,7 @@ RUN pip install \
     --index-url $PYPI_REPO \
     --requirement requirements.txt
 
+# Cleanup
+ENV PYPI_REPO 'None'
+
 ENTRYPOINT ["python", "/src/start_service.py"]
