@@ -1,13 +1,15 @@
-
+import os
 from threading import Thread
-from mqtt_handler import MQTTClient
+
+from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT
 from configs import DEVICES
 from logging_handler import logger
-from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT
+from mqtt_handler import MQTTClient
+
+VERSION = os.environ.get('version', 'null')
 
 
 def init_simulator(device_id, device_pass, device_type, device_qos, topic, subscription_update):
-
     if device_type not in DEVICES:
         logger.error("Error: trying to init unknown simulator type - " + device_type)
         exit(1)
@@ -35,8 +37,9 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
 
 
 if __name__ == '__main__':
-    for key, value in DEVICES.items():
+    logger.info("Starting server with version: " + VERSION)
 
+    for key, value in DEVICES.items():
         Thread(target=init_simulator,
                args=(value['device_user'],
                      value['device_pass'],
