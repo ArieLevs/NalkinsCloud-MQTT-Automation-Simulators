@@ -8,8 +8,8 @@ import socket
 import random
 import os
 
-host_name = "alpha.mosquitto.nalkins.cloud"
-server_port = 1883
+host_name = "mosquitto.alpha.nalkins.cloud"
+server_port = 8883
 device_id = "test_switch_simulator"
 device_password = "test_switch_simulator"
 
