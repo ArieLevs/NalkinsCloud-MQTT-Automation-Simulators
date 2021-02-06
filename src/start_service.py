@@ -19,7 +19,8 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
             {"broker_host": BROKER_HOST,
              "broker_port": BROKER_PORT,
              "broker_cert": BROKER_CERT,
-             "broker_tls": BROKER_TLS}
+             "broker_tls": BROKER_TLS,
+             "broker_tls_skip": BROKER_TLS_SKIP}
         ))
 
         mqtt_client = MQTTClient(broker_host=BROKER_HOST, broker_port=BROKER_PORT,
