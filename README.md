@@ -9,6 +9,8 @@ Docker container expects these env vars:
 - environment
 - broker_host
 - broker_port
+- broker_tls
+- broker_tls_skip
 - dht_user
 - dht_pass
 - dht_topic

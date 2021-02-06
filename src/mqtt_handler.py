@@ -22,20 +22,22 @@ class MQTTClient(object):
     _broker_port = None
     _broker_tls = None
     _broker_cert = None
-
-    _device_id = None
-    _device_type = None
-    _qos = None
-    _topic = None
-    _subscription_update = None
-    _mqtt_client = None
+    _broker_tls_skip = False
 
     def __init__(self, broker_host='127.0.0.1', broker_port=1883,
-                 broker_tls=False, broker_cert=''):
+                 broker_tls=False, broker_cert='', broker_tls_skip=False):
         self._broker_host = broker_host
         self._broker_port = broker_port
         self._broker_cert = broker_cert
         self._broker_tls = broker_tls
+        self._broker_tls_skip = broker_tls_skip
+
+        self._device_id = None
+        self._device_type = None
+        self._qos = None
+        self._topic = None
+        self._subscription_update = None
+        self._mqtt_client = None
 
     def init_device(self, device_id, device_type, device_password, qos, topic, subscription_update):
         self._device_id = device_id
@@ -54,11 +56,18 @@ class MQTTClient(object):
         self._mqtt_client.username_pw_set(username=self._device_id, password=device_password)
 
         if self._broker_tls:
-            self._mqtt_client.tls_set(ca_certs=self._broker_cert, tls_version=ssl.PROTOCOL_TLSv1_1)
+            if self._broker_tls_skip:
+                self._mqtt_client.tls_set(ca_certs=self._broker_cert,
+                                          tls_version=ssl.PROTOCOL_TLSv1_2,
+                                          cert_reqs=ssl.CERT_NONE)
+                self._mqtt_client.tls_insecure_set(True)
+            else:
+                self._mqtt_client.tls_set(ca_certs=self._broker_cert,
+                                          tls_version=ssl.PROTOCOL_TLSv1_2)
 
-        if self._device_type is 'dht':
+        if self._device_type == 'dht':
             self._mqtt_client.on_message = self.on_dht_message
-        elif self._device_type is 'switch':
+        elif self._device_type == 'switch':
             self._mqtt_client.on_message = self.on_switch_message
         self._mqtt_client.on_connect = self.on_connect
 
@@ -143,7 +152,7 @@ class MQTTClient(object):
             logger.error("Error: invalid topic received")
 
     def on_dht_connect(self, mqttc, userdata, flags, rc):
-        if rc is not 0:
+        if rc != 0:
 
             logger.error("Error: " + self._device_id +
                          ", " + CONNECTION_RETURN_STATUS.get(rc))
@@ -158,7 +167,7 @@ class MQTTClient(object):
             logger.info(CONNECTION_RETURN_STATUS.get(rc))
 
     def on_connect(self, mqttc, userdata, flags, rc):
-        if rc is not 0:
+        if rc != 0:
 
             logger.error("Error: " + self._device_id +
                          ", " + CONNECTION_RETURN_STATUS.get(rc))

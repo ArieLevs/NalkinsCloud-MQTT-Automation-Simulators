@@ -1,7 +1,7 @@
 import os
 from threading import Thread
 
-from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT
+from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT, BROKER_TLS_SKIP
 from configs import DEVICES
 from logging_handler import logger
 from mqtt_handler import MQTTClient
@@ -15,9 +15,15 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
         exit(1)
     else:
         logger.info("Starting new thread as device: " + device_id)
+        logger.info("mqtt_client values: {}".format(
+            {"broker_host": BROKER_HOST,
+             "broker_port": BROKER_PORT,
+             "broker_cert": BROKER_CERT,
+             "broker_tls": BROKER_TLS}
+        ))
 
         mqtt_client = MQTTClient(broker_host=BROKER_HOST, broker_port=BROKER_PORT,
-                                 broker_cert=BROKER_CERT, broker_tls=BROKER_TLS)
+                                 broker_cert=BROKER_CERT, broker_tls=BROKER_TLS, broker_tls_skip=BROKER_TLS_SKIP)
         mqtt_client.init_device(device_id=device_id,
                                 device_password=device_pass,
                                 device_type=device_type,

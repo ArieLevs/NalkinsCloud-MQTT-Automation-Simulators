@@ -14,7 +14,7 @@ device_id = "test_switch_simulator"
 device_password = "test_switch_simulator"
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
-cert_location = BASE_DIR + "/certificates/alpha.mosquitto_server.crt"
+cert_location = BASE_DIR + "/certificates/mosquitto_server.crt"
 topic = "test_switch_simulator/switch/status"
 
 auth = {
@@ -24,7 +24,7 @@ auth = {
 
 tls = {
   'ca_certs': cert_location,
-  'tls_version': ssl.PROTOCOL_TLSv1_1
+  'tls_version': ssl.PROTOCOL_TLSv1_2
 }
 
 
@@ -36,7 +36,8 @@ def publishmsg(top, msg):
                    client_id=device_id,
                    port=server_port,
                    protocol=mqtt.MQTTv311,
-                   retain=True)
+                   retain=True,
+                   tls=tls)
 
 
 temp = random.randint(10, 33)

@@ -9,6 +9,7 @@ BROKER_HOST = os.environ.get('broker_host', 'localhost')
 BROKER_PORT = int(os.environ.get('broker_port', 1883))
 BROKER_TLS = bool(os.environ.get('broker_tls', False))
 BROKER_CERT = BASE_DIR + "/certificates/mosquitto_server.crt"
+BROKER_TLS_SKIP = bool(os.environ.get('broker_tls_skip', False))
 
 DEVICES = {
     'dht': {
