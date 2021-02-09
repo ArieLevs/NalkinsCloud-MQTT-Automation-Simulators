@@ -4,12 +4,12 @@ from threading import Thread
 from configs import BROKER_HOST, BROKER_PORT, BROKER_TLS, BROKER_CERT, BROKER_TLS_SKIP
 from configs import DEVICES
 from logging_handler import logger
-from mqtt_handler import MQTTClient
+from nalkinscloud_mqtt_python_client.mqtt_handler import MQTTClient
 
 VERSION = os.environ.get('version', 'null')
 
 
-def init_simulator(device_id, device_pass, device_type, device_qos, topic, subscription_update):
+def init_simulator(device_id, device_pass, device_type, device_qos, subscription_update):
     if device_type not in DEVICES:
         logger.error("Error: trying to init unknown simulator type - " + device_type)
         exit(1)
@@ -29,7 +29,6 @@ def init_simulator(device_id, device_pass, device_type, device_qos, topic, subsc
                                 device_password=device_pass,
                                 device_type=device_type,
                                 qos=device_qos,
-                                topic=topic,
                                 subscription_update=subscription_update)
         mqtt_client.set_lwt(device_id=device_id,
                             device_type=device_type,
@@ -52,6 +51,5 @@ if __name__ == '__main__':
                      value['device_pass'],
                      value['device_type'],
                      value['qos'],
-                     value['topic'],
                      value['subscription_update']),
                name=value['device_user']).start()

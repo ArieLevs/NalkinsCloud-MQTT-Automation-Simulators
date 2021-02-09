@@ -10,12 +10,12 @@ import os
 
 host_name = "mosquitto.alpha.nalkins.cloud"
 server_port = 8883
-device_id = "test_switch_simulator"
-device_password = "test_switch_simulator"
+device_id = "publish_single"
+device_password = "publish_single"
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 cert_location = BASE_DIR + "/certificates/mosquitto_server.crt"
-topic = "test_switch_simulator/switch/status"
+topic = "test_dht_device_id/dht/temperature"
 
 auth = {
   'username': device_id,
@@ -23,8 +23,10 @@ auth = {
 }
 
 tls = {
-  'ca_certs': cert_location,
-  'tls_version': ssl.PROTOCOL_TLSv1_2
+    'insecure': True,
+    'ca_certs': None,
+    'cert_reqs': ssl.CERT_NONE,
+    'tls_version': ssl.PROTOCOL_TLSv1_2,
 }
 
 
@@ -49,4 +51,4 @@ data = {
 
 print("Publishing message")
 #publishmsg(topic, json.dumps(text))
-publishmsg(topic, text)
+publishmsg(topic, temp)

@@ -1,0 +1,4 @@
+
+paho-mqtt==1.5.1
+graypy==1.1.1
+nalkinscloud-mqtt-python-client==0.0.2
