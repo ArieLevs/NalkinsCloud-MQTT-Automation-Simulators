@@ -1,96 +1,96 @@
-name: Python package
-
-on:
-  push:
-    # run only when pushed to master branch.
-    branches:
-      - master
-
-    # run on every publish tags.
-    tags:
-      - v*
-  # run on any pr.
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 2
-      matrix:
-        python-version: [3.6, 3.8]
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv
-
-#    - name: Test with unittest
+#name: Python package
+#
+#on:
+#  push:
+#    # run only when pushed to master branch.
+#    branches:
+#      - master
+#
+#    # run on every publish tags.
+#    tags:
+#      - v*
+#  # run on any pr.
+#  pull_request:
+#
+#jobs:
+#  test:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      max-parallel: 2
+#      matrix:
+#        python-version: [3.6, 3.8]
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python ${{ matrix.python-version }}
+#      uses: actions/setup-python@v1
+#      with:
+#        python-version: ${{ matrix.python-version }}
+#
+#    - name: Lint with flake8
 #      run: |
-#        pip install -r requirements.txt
-#        # discover all tests in the test directory
-#        python -m unittest discover test -vv -t .
-
-  build:
-    if: github.ref == 'refs/heads/master'
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - name: Bump version using self app
-        id: app_version_bump
-        run: |
-          pip install pybump==1.7.1
-          echo "::set-output name=app_version::$(pybump bump --level patch --file VERSION)"
-
-      - name: Build and push docker image
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: arielev/pybump
-          tags: ${{ steps.app_version_bump.outputs.app_version }},latest
-
-  commit:
-    if: github.ref == 'refs/heads/master'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      # currently there is no way of passing data between jobs except using artifact,
-      # this might be an option, but just do another bump for now,
-      # and anyway setup.py file will need to have some change since we checked out again
-      - name: Bump version using self app
-        id: app_version_bump
-        run: |
-          pip install pybump==1.7.1
-          echo "::set-output name=app_version::$(pybump bump --level patch --file VERSION)"
-
-      - name: Commit new version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Update version on git repo
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git config --local user.name "GitHub Action"
-          git add VERSION
-          git commit -m "update version to: ${{ steps.app_version_bump.outputs.app_version }} (github action)"
-
-          git push https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/ArieLevs/NalkinsCloud-MQTT-Automation-Simulators HEAD:master
+#        pip install flake8
+#        # stop the build if there are Python syntax errors or undefined names
+#        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv
+#        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+#        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv
+#
+##    - name: Test with unittest
+##      run: |
+##        pip install -r requirements.txt
+##        # discover all tests in the test directory
+##        python -m unittest discover test -vv -t .
+#
+#  build:
+#    if: github.ref == 'refs/heads/master'
+#    needs: test
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.x'
+#      - name: Bump version using self app
+#        id: app_version_bump
+#        run: |
+#          pip install pybump==1.7.1
+#          echo "::set-output name=app_version::$(pybump bump --level patch --file VERSION)"
+#
+#      - name: Build and push docker image
+#        uses: docker/build-push-action@v1
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+#          repository: arielev/pybump
+#          tags: ${{ steps.app_version_bump.outputs.app_version }},latest
+#
+#  commit:
+#    if: github.ref == 'refs/heads/master'
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.x'
+#      # currently there is no way of passing data between jobs except using artifact,
+#      # this might be an option, but just do another bump for now,
+#      # and anyway setup.py file will need to have some change since we checked out again
+#      - name: Bump version using self app
+#        id: app_version_bump
+#        run: |
+#          pip install pybump==1.7.1
+#          echo "::set-output name=app_version::$(pybump bump --level patch --file VERSION)"
+#
+#      - name: Commit new version
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          # Update version on git repo
+#          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+#          git config --local user.name "GitHub Action"
+#          git add VERSION
+#          git commit -m "update version to: ${{ steps.app_version_bump.outputs.app_version }} (github action)"
+#
+#          git push https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/ArieLevs/NalkinsCloud-MQTT-Automation-Simulators HEAD:master
