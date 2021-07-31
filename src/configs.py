@@ -7,9 +7,9 @@ ENVIRONMENT = os.environ.get('environment', 'dev')
 
 BROKER_HOST = os.environ.get('broker_host', 'localhost')
 BROKER_PORT = int(os.environ.get('broker_port', 1883))
-BROKER_TLS = bool(os.environ.get('broker_tls', False))
+BROKER_TLS = bool(os.environ.get('broker_tls', False) in ["true", "True"])
 BROKER_CERT = None
-BROKER_TLS_SKIP = bool(os.environ.get('broker_tls_skip', False))
+BROKER_TLS_SKIP = bool(os.environ.get('broker_tls_skip', False) in ["true", "True"])
 
 DEVICES = {
     'dht': {
