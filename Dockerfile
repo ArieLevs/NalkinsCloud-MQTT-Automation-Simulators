@@ -1,5 +1,4 @@
-
-FROM python:3.6-alpine
+FROM python:3.9-alpine
 
 MAINTAINER Arie Lev
 
@@ -11,6 +10,7 @@ RUN mkdir /src
 WORKDIR /src
 
 ADD src /src/
+ADD requirements.txt .
 RUN pip install \
     --index-url $PYPI_REPO \
     --requirement requirements.txt

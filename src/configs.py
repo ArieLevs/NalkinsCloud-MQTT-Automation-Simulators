@@ -4,6 +4,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 PROJECT_NAME = 'nalkinscloud-mqtt-simulators'
 ENVIRONMENT = os.environ.get('environment', 'dev')
+LOGGING_EXTRA_FIELDS = {'application': PROJECT_NAME, 'environment': ENVIRONMENT}
 
 BROKER_HOST = os.environ.get('broker_host', 'localhost')
 BROKER_PORT = int(os.environ.get('broker_port', 1883))
@@ -28,10 +29,3 @@ DEVICES = {
     }
 }
 
-######################
-# LOGGING SETTINGS
-######################
-GRAYLOG_ENABLED = os.environ.get('graylog_enabled', False) == 'True'
-GRAYLOG_HOST = os.environ.get('graylog_host', 'localhost')
-GRAYLOG_PORT = os.environ.get('graylog_port', 12201)
-EXTRA_FIELDS = {'application': PROJECT_NAME, 'environment': ENVIRONMENT}
